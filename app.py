@@ -9,9 +9,9 @@ def generate_flashcards():
     
     # Get the text input and number of flashcards from the request
     text = request.args.get('text')
-    print(text)
+    #print(text)
     num_flashcards = request.args.get('num_flashcards_limit')
-    print(num_flashcards)
+    #print(num_flashcards)
     num_flashcards=int(num_flashcards)
     # Call your machine learning model to generate the flashcards
     flashcards = main.generate_flashcards(text, num_flashcards)

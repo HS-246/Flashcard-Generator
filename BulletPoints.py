@@ -17,7 +17,7 @@ tokenizer = BartTokenizer.from_pretrained(model_name)
 model = BartForConditionalGeneration.from_pretrained(model_name)
 
 # Sample large piece of text
-corpus = " "
+corpus = " Dinosaurs went extinct 3 million years ago. we love dinosaurs. My favourite dinosaur is the Brontosaurus. We kow aout the existence of dinosaurs from the fossils found by archeologists which help us determine the skeletal structure of dinosaurs and their potential habitat."
 
 # Tokenize the text into sentences
 sentences = sent_tokenize(corpus)

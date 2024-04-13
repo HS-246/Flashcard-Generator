@@ -3,12 +3,16 @@ import main
 
 app = Flask(__name__)
 
-@app.route('/generate_flashcards', methods=['POST'])
+@app.route('/generate_flashcards', methods=['GET'])
 def generate_flashcards():
-    # Get the text input and number of flashcards from the request
-    text = request.json['text']
-    num_flashcards = request.json['num_flashcards_limit']
 
+    
+    # Get the text input and number of flashcards from the request
+    text = request.args.get('text')
+    print(text)
+    num_flashcards = request.args.get('num_flashcards_limit')
+    print(num_flashcards)
+    num_flashcards=int(num_flashcards)
     # Call your machine learning model to generate the flashcards
     flashcards = main.generate_flashcards(text, num_flashcards)
 

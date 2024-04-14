@@ -3,9 +3,13 @@ import nltk
 from nltk.tokenize import sent_tokenize
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
 from sentence_transformers import SentenceTransformer
+import spacy
 
 # Download necessary NLTK resources
 nltk.download('punkt')
+
+# Load the spaCy model
+nlp = spacy.load("en_core_web_sm")
 
 # Load the model and tokenizer for question generation
 qg_tokenizer = AutoTokenizer.from_pretrained("valhalla/t5-base-e2e-qg")
@@ -21,7 +25,8 @@ sentence_bert_model = SentenceTransformer('average_word_embeddings_glove.6B.300d
 # Define the function to generate flashcards
 def generate_flashcards(text, num_flashcards):      
     # Tokenize the text into sentences
-    sentences = sent_tokenize(text)
+    doc = nlp(text)
+    sentences = [sent.text for sent in doc.sents]
 
     # Generate questions
     questions = []
@@ -30,7 +35,7 @@ def generate_flashcards(text, num_flashcards):
         if question:
             questions.append(question[0]['generated_text'])
 
-    # Rank questions based on quality/relevance using embeddings
+    #Rank questions based on quality/relevance using embeddings
     if questions:
         question_embeddings = sentence_bert_model.encode(questions)
         ranking_scores = question_embeddings.dot(question_embeddings.T).mean(axis=1)  # Compute cosine similarity scores
@@ -41,7 +46,7 @@ def generate_flashcards(text, num_flashcards):
 
     # Generate answers for selected questions
     answers = []
-    for question in selected_questions:
+    for question in questions:
         inputs = qa_tokenizer(question, text, add_special_tokens=True, return_tensors="pt")
         outputs = qa_model(**inputs)
         answer_start = torch.argmax(outputs.start_logits)  # Start of answer
@@ -51,6 +56,8 @@ def generate_flashcards(text, num_flashcards):
         answer = qa_tokenizer.convert_tokens_to_string(qa_tokenizer.convert_ids_to_tokens(inputs.input_ids[0][answer_start:answer_end]))
         answer = answer.replace("Ġ", " ")  # Fix subword tokenization artifacts
         answers.append(answer.strip())
+
+
 
     # Prepare flashcards
     flashcards = [{'question': q, 'answer': a} for q, a in zip(selected_questions, answers)]
